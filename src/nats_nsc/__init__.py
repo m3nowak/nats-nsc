@@ -1,106 +1,81 @@
-import base64
-import json
+import aiofiles
 import os
-import shutil
+import typing as ty
 import tempfile
-import typing
-from dataclasses import dataclass
 
-from nats_nsc import nsc_utils
+import jwt
 
+from nats_nsc import nsc_utils, common
 
 _DEFAULT_NSC_PATH = "nsc"
 
-@dataclass
-class Operator():
-    name: str
-    jwt_path: str
-    pub_key: str
-    jwt_payload: typing.Dict[str, typing.Any]
-
-@dataclass
-class Account():
-    name: str
-    jwt_path: str
-    pub_key: str
-    has_priv_key: bool
-
-class Credential():
-    def __init__(self, payload:str) -> None:
-        self._payload = payload
-    
-    @property
-    def payload(self) -> str:
-        return self._payload
-    
-    @property
-    def jwt(self) -> str:
-        payload_splitted = self._payload.split('\n')
-        jwt_line_start = payload_splitted.index('-----BEGIN NATS ACCOUNT JWT-----')
-        jwt_line_end = payload_splitted.index('-----END NATS ACCOUNT JWT-----')
-        return '\n'.join(payload_splitted[jwt_line_start+1:jwt_line_end])
-
-    @property
-    def nkey(self) -> str:
-        payload_splitted = self._payload.split('\n')
-        nkey_line_start = payload_splitted.index('-----BEGIN USER NKEY SEED-----')
-        nkey_line_end = payload_splitted.index('-----END USER NKEY SEED-----')
-        return '\n'.join(payload_splitted[nkey_line_start+1:nkey_line_end])
 
 class Context():
     '''Base context for nsc-py, including working directory and nsc binary path.'''
 
-    def __init__(self, nsc_path: typing.Optional[str] = None):
-        self._nsc_path = nsc_path or _DEFAULT_NSC_PATH
-        if not nsc_utils.verify_binary(self._nsc_path):
+    @classmethod
+    async def async_factory(cls, nsc_path: ty.Optional[str] = None) -> 'Context':
+        '''Create a context asynchronously.'''
+
+        _nsc_path = nsc_path or _DEFAULT_NSC_PATH
+        if not await nsc_utils.verify_binary(_nsc_path):
             if nsc_path is None:
                 raise ValueError("nsc binary not found in PATH")
             else:
-                raise ValueError(f"Invalid nsc binary path: {self._nsc_path}")
-        self.work_dir = tempfile.mkdtemp(prefix='nsc-py-')
+                raise ValueError(f"Invalid nsc binary path: {_nsc_path}")
+        work_dir = tempfile.TemporaryDirectory(prefix='nsc-py-')
+        ctx = cls(work_dir, _nsc_path)
+        return ctx
+
+    def __init__(self, work_dir: tempfile.TemporaryDirectory, nsc_path: str):
+        self._nsc_path = nsc_path
+        self.work_dir = work_dir
         self.operators = {}
         self.accounts = {}
 
     @classmethod
-    def _decode_jwt_payload(cls, jwt: str) -> dict:
+    def _decode_jwt_payload(cls, jwt_token: str) -> dict:
         '''Decode JWT payload.'''
         try:
-            return json.loads(base64.b64decode(jwt.split('.')[1]))
+            return jwt.decode(jwt_token, options={"verify_signature": False})
         except Exception:
             raise ValueError("Invalid JWT")
-    
-    def add_operator(self, jwt: str) -> Operator:
-        payload = self._decode_jwt_payload(jwt)
+
+    async def add_operator(self, jwt_token: str) -> common.Operator:
+        payload = self._decode_jwt_payload(jwt_token)
         if payload['nats']['type'] != 'operator':
             raise ValueError("Invalid JWT type")
-        nsc_utils.load_operator(self._nsc_path, self.work_dir, jwt)
+        await nsc_utils.load_operator(self._nsc_path, self.work_dir.name, jwt_token)
         op_name = payload['name']
-        operator = Operator(
+        operator = common.Operator(
             name=op_name,
-            jwt_path=os.path.join(self.work_dir, f"{op_name}/{op_name}.jwt"),
+            jwt_path=os.path.join(self.work_dir.name, f"{op_name}/{op_name}.jwt"),
             pub_key=payload['sub'],
             jwt_payload=payload
         )
         self.operators[op_name] = operator
         return operator
 
-    def add_account(self, jwt: str, priv_key: str) -> Account:
-        payload = self._decode_jwt_payload(jwt)
+    async def add_account(self, jwt_token: str, operator: common.Operator,
+                          priv_key: ty.Optional[str] = None) -> common.Account:
+        payload = self._decode_jwt_payload(jwt_token)
         if payload['nats']['type'] != 'account':
             raise ValueError("Invalid JWT type")
         if priv_key is not None:
-            nsc_utils.load_key(self._nsc_path, self.work_dir, priv_key)
+            await nsc_utils.load_key(self._nsc_path, self.work_dir.name, priv_key)
         acc_name = payload['name']
-        nsc_utils.load_account(self.work_dir, jwt, acc_name)
-        account = Account(
+        await nsc_utils.load_account(self.work_dir.name, jwt_token, operator, acc_name)
+        account = common.Account(
             name=acc_name,
-            jwt_path=os.path.join(self.work_dir, f"accounts/{acc_name}/{acc_name}.jwt"),
+            jwt_path=os.path.join(self.work_dir.name, f"accounts/{acc_name}/{acc_name}.jwt"),
             pub_key=payload['sub'],
             has_priv_key=priv_key is not None
         )
         self.accounts[acc_name] = account
         return account
 
+    async def create_user(self, user_name: str, account: common.Account) -> common.Credential:
+        return await nsc_utils.create_user(self._nsc_path, self.work_dir.name, user_name, account)
 
     def __del__(self):
-        shutil.rmtree(self.work_dir, ignore_errors=True)
+        self.work_dir.cleanup()
