@@ -2,7 +2,6 @@ import base64
 import json
 import os
 import shutil
-import subprocess
 import tempfile
 import typing
 from dataclasses import dataclass
@@ -67,7 +66,7 @@ class Context():
         '''Decode JWT payload.'''
         try:
             return json.loads(base64.b64decode(jwt.split('.')[1]))
-        except Exception as e:
+        except Exception:
             raise ValueError("Invalid JWT")
     
     def add_operator(self, jwt: str) -> Operator:
