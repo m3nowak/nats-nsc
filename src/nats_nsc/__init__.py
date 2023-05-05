@@ -71,7 +71,7 @@ class Context():
     
     def add_operator(self, jwt: str) -> Operator:
         payload = self._decode_jwt_payload(jwt)
-        if payload['type'] != 'operator':
+        if payload['nats']['type'] != 'operator':
             raise ValueError("Invalid JWT type")
         nsc_utils.load_operator(self._nsc_path, self.work_dir, jwt)
         op_name = payload['name']
@@ -86,7 +86,7 @@ class Context():
 
     def add_account(self, jwt: str, priv_key: str) -> Account:
         payload = self._decode_jwt_payload(jwt)
-        if payload['type'] != 'account':
+        if payload['nats']['type'] != 'account':
             raise ValueError("Invalid JWT type")
         if priv_key is not None:
             nsc_utils.load_key(self._nsc_path, self.work_dir, priv_key)
