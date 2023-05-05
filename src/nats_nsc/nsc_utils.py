@@ -115,16 +115,21 @@ async def create_user(nsc_path: str, nsc_work_dir: str,
 
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE)
-    #await process.wait()
-    _, resp= await process.communicate()
+    # await process.wait()
+    _, resp = await process.communicate()
     creds_path = list(
         filter(lambda x: 'generated user creds file' in x, resp.decode().split('\n')))
     if len(creds_path) == 0:
         raise Exception(f'Could not create user {resp}')
     else:
         creds_path = creds_path[0].split('`')[1]
-    creds = None
-    async with aiofiles.open(creds_path, 'r') as cfle:
-        creds = await cfle.read()
+    creds_txt = None
+    async with aiofiles.open(creds_path, 'r') as c_file:
+        creds_txt = await c_file.read()
+    creds = common.Credential(creds_txt)
 
-    return common.Credential(creds)
+    await common.delete_file(os.path.join(nsc_work_dir, common.key_subpath(creds.jwt['sub'])))
+    await common.delete_file(os.path.join(nsc_work_dir, 'creds', account.operator_name,
+                                          account.name, f'{user_name}.creds'))
+
+    return creds

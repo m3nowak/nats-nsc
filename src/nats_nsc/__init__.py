@@ -1,9 +1,6 @@
-import aiofiles
 import os
 import typing as ty
 import tempfile
-
-import jwt
 
 from nats_nsc import nsc_utils, common
 
@@ -33,16 +30,8 @@ class Context():
         self.operators = {}
         self.accounts = {}
 
-    @classmethod
-    def _decode_jwt_payload(cls, jwt_token: str) -> dict:
-        '''Decode JWT payload.'''
-        try:
-            return jwt.decode(jwt_token, options={"verify_signature": False})
-        except Exception:
-            raise ValueError("Invalid JWT")
-
     async def add_operator(self, jwt_token: str) -> common.Operator:
-        payload = self._decode_jwt_payload(jwt_token)
+        payload = common.decode_jwt_payload(jwt_token)
         if payload['nats']['type'] != 'operator':
             raise ValueError("Invalid JWT type")
         await nsc_utils.load_operator(self._nsc_path, self.work_dir.name, jwt_token)
@@ -58,7 +47,7 @@ class Context():
 
     async def add_account(self, jwt_token: str, operator: common.Operator,
                           priv_key: ty.Optional[str] = None) -> common.Account:
-        payload = self._decode_jwt_payload(jwt_token)
+        payload = common.decode_jwt_payload(jwt_token)
         if payload['nats']['type'] != 'account':
             raise ValueError("Invalid JWT type")
         if priv_key is not None:
@@ -67,6 +56,7 @@ class Context():
         await nsc_utils.load_account(self.work_dir.name, jwt_token, operator, acc_name)
         account = common.Account(
             name=acc_name,
+            operator_name=operator.name,
             jwt_path=os.path.join(self.work_dir.name, f"accounts/{acc_name}/{acc_name}.jwt"),
             pub_key=payload['sub'],
             has_priv_key=priv_key is not None

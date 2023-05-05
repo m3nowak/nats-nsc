@@ -30,8 +30,8 @@ async def test_user_creation():
     operator = await ctx.add_operator(OP_JWT)
     account = await ctx.add_account(AC_JWT, operator, AC_KEY)
     user = await ctx.create_user('test_user', account)
-    user.jwt
-    user.nkey
+    assert user.jwt['nats']['type'] == 'user'
+    assert user.nkey.startswith('SU')
 
 
 @pytest.mark.asyncio
