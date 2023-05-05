@@ -36,6 +36,6 @@ jobs:
     - name: Install dependencies
       run: pdm install
     - name: Build package
-      run: pdm build
+      run: pdm build -v
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
