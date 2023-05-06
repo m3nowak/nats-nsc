@@ -14,7 +14,7 @@ class Context():
     async def async_factory(cls, nsc_path: ty.Optional[str] = None) -> 'Context':
         '''Create a context asynchronously.'''
 
-        _nsc_path = nsc_path or _DEFAULT_NSC_PATH
+        _nsc_path = nsc_path or str(_DEFAULT_NSC_PATH)
         if not await nsc_utils.verify_binary(_nsc_path):
             if nsc_path is None:
                 raise ValueError("nsc binary not found in PATH")

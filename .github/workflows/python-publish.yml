@@ -34,8 +34,8 @@ jobs:
         python-version: '3.8'
         architecture: x64
     # Don't judge me, somehow changing hashes in upstream packages is not uncommon. It does not make sense, I know.
-    - name: Clear lock
-      run: rm pdm.lock
+    - name: PDM fix urllib3
+      run: pdm self add 'urllib3<2'
     - name: Install dependencies
       run: pdm install --prod
     - name: Build package
