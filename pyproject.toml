@@ -2,10 +2,10 @@
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "ruff>=0.0.264",
-    "pytest>=7.3.1",
-    "pytest-asyncio>=0.21.0",
-    "autopep8>=2.0.2",
+    "ruff==0.0.264",
+    "pytest~=7.3.1",
+    "pytest-asyncio~=0.21.0",
+    "autopep8~=2.0.2",
 ]
 
 [tool.pdm.build]
@@ -21,8 +21,8 @@ authors = [
     {name = "Mikołaj Nowak", email = "12396461+m3nowak@users.noreply.github.com"},
 ]
 dependencies = [
-    "pyJWT>=2.6.0",
-    "aiofiles>=23.1.0",
+    "pyJWT~=2.6.0",
+    "aiofiles~=23.1.0",
 ]
 requires-python = ">=3.8"
 readme = "README.md"

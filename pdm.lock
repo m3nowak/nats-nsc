@@ -97,7 +97,7 @@ summary = "A lil' TOML parser"
 [metadata]
 lock_version = "4.2"
 groups = ["default", "dev"]
-content_hash = "sha256:a1ba340e3a7bfd84dad2b22890d332079cb3afdce80d2047fd6afad1128e3653"
+content_hash = "sha256:e2acbbb61d9dcb53931c47f06f410b3c1bbc81e8e9493f41bed58ee0b485e7dc"
 
 [metadata.files]
 "aiofiles 23.1.0" = [
