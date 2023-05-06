@@ -15,7 +15,7 @@ package-dir = "src"
 
 [project]
 name = "nats-nsc"
-version = "0.2.0"
+version = "0.2.1"
 description = "Python wrapper for nsc, nats credential manager"
 authors = [
     {name = "Mikołaj Nowak", email = "12396461+m3nowak@users.noreply.github.com"},

@@ -1,6 +1,7 @@
 import os
 import typing as ty
 import tempfile
+from datetime import timedelta
 
 from nats_nsc import nsc_utils, common
 
@@ -64,8 +65,36 @@ class Context():
         self.accounts[acc_name] = account
         return account
 
-    async def create_user(self, user_name: str, account: common.Account) -> common.Credential:
-        return await nsc_utils.create_user(self._nsc_path, self.work_dir.name, user_name, account)
+    async def create_user(self, user_name: str, account: common.Account,
+                          allow_pub: ty.Optional[ty.List[str]] = None,
+                          allow_pub_response: ty.Optional[int] = None,
+                          allow_pubsub: ty.Optional[ty.List[str]] = None,
+                          allow_sub: ty.Optional[ty.List[str]] = None,
+                          bearer: bool = False,
+                          deny_pub: ty.Optional[ty.List[str]] = None,
+                          deny_pubsub: ty.Optional[ty.List[str]] = None,
+                          deny_sub: ty.Optional[ty.List[str]] = None,
+                          expiry: ty.Optional[timedelta] = None,
+                          response_ttl: ty.Optional[timedelta] = None,
+                          source_networks: ty.Optional[ty.List[str]] = None,
+                          start: ty.Optional[timedelta] = None,
+                          tag: ty.Optional[ty.List[str]] = None) -> common.Credential:
+        return await nsc_utils.create_user(self._nsc_path,
+                                           self.work_dir.name,
+                                           user_name, account,
+                                           allow_pub,
+                                           allow_pub_response,
+                                           allow_pubsub,
+                                           allow_sub,
+                                           bearer,
+                                           deny_pub,
+                                           deny_pubsub,
+                                           deny_sub,
+                                           expiry,
+                                           response_ttl,
+                                           source_networks,
+                                           start,
+                                           tag)
 
     def __del__(self):
         self.work_dir.cleanup()

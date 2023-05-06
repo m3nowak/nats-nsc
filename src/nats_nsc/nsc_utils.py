@@ -72,7 +72,7 @@ def _timedelta_to_nats_duration_precise(td: timedelta) -> str:
 async def create_user(nsc_path: str, nsc_work_dir: str,
                       user_name: str, account: common.Account,
                       allow_pub: ty.Optional[ty.List[str]] = None,
-                      allow_pub_response: int = 1,
+                      allow_pub_response: ty.Optional[int] = None,
                       allow_pubsub: ty.Optional[ty.List[str]] = None,
                       allow_sub: ty.Optional[ty.List[str]] = None,
                       bearer: bool = False,
@@ -86,7 +86,9 @@ async def create_user(nsc_path: str, nsc_work_dir: str,
                       tag: ty.Optional[ty.List[str]] = None) -> common.Credential:
     '''Create user.'''
     args = [nsc_path, "-H", nsc_work_dir, 'add', 'user', '-a', shlex.quote(account.name), '-n', shlex.quote(
-        user_name), f'--allow-pub-response={allow_pub_response}']
+        user_name)]
+    if allow_pub_response is not None:
+        args.append(f'--allow-pub-response={allow_pub_response}')
     if allow_pub is not None:
         args += ['--allow-pub', shlex.quote(','.join(allow_pub))]
     if allow_pubsub is not None:
