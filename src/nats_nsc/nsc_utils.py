@@ -94,7 +94,7 @@ async def create_user(nsc_path: str, nsc_work_dir: str,
     if allow_pubsub is not None:
         args += ['--allow-pubsub', shlex.quote(','.join(allow_pubsub))]
     if allow_sub is not None:
-        args += ['--allow-sub', shlex.quote(','.join(allow_sub))]
+        args += ['--allow-sub', ','.join(allow_sub)]
     if bearer:
         args += ['--bearer']
     if deny_pub is not None:
