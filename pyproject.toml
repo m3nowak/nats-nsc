@@ -15,16 +15,15 @@ package-dir = "src"
 
 [project]
 name = "nats-nsc"
-version = "0.3.0-pre1"
-description = "Python wrapper for nsc, nats credential manager"
+version = "0.3.0"
+description = "Limited python nsc utility equivalent, for user creation and signing JWTs."
 authors = [
     {name = "Mikołaj Nowak", email = "12396461+m3nowak@users.noreply.github.com"},
 ]
 dependencies = [
     "pyJWT~=2.6.0",
     "aiofiles~=23.1.0",
-    "nkeys>=0.1.0",
-    "pynacl>=1.5.0",
+    "nkeys~=0.1.0",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
