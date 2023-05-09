@@ -13,4 +13,5 @@ def test_basic_workflow():
     assert set(usr.pub_permissions.allow) == set(['foo', 'bar.*'])
     assert set(usr.sub_permissions.allow) == set(['_INBOX.user0.>', 'bar.*'])
     assert usr.subject == 'UDZBHCCXJREZRPMRHZFEBNF6TTOVYUMB4J36GM6UJUQUJMRC5GBZ5BLG'
-
+    a = usr.full_jwt
+    pass

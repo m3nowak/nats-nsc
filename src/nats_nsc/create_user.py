@@ -79,7 +79,7 @@ def create_user(user_name: str, account: common.Account,
     
     payload = {
         'jti': uuid.uuid4().hex,
-        'iat': issued_at.timestamp(),
+        'iat': int(issued_at.timestamp()),
         'iss': account.pub_key,
         'name': user_name,
         'sub': pub_key,
@@ -95,7 +95,7 @@ def create_user(user_name: str, account: common.Account,
     }
 
     if expiry is not None:
-        payload['exp'] = (issued_at + expiry).timestamp()
+        payload['exp'] = int((issued_at + expiry).timestamp())
     if resp is not None:
         payload['nats']['resp'] = resp
     if source_networks:
