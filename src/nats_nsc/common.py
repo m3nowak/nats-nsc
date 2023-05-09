@@ -108,6 +108,11 @@ class Operator(_Auth):
 
 class Account(_Auth):
     priv_key: ty.Optional[str] = None
+
+    def __init__(self, jwt_token: str, priv_key: ty.Optional[str] = None) -> None:
+        super().__init__(jwt_token)
+        self.priv_key = priv_key
+
     @classmethod
     def _verify_payload(cls, payload: ty.Dict[str, ty.Any]) -> bool:
         return payload['nats']['type'] == 'account'
