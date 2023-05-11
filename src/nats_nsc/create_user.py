@@ -14,7 +14,7 @@ HEADER = {
 }
 
 def create_user(user_name: str, account: common.Account,
-                pub_key: str,
+                pub_key: str, *, jwt_id: ty.Optional[str] = None,
                 allow_pub: ty.Optional[ty.List[str]] = None,
                 allow_pub_response: ty.Optional[int] = None,
                 allow_pubsub: ty.Optional[ty.List[str]] = None,
@@ -78,7 +78,7 @@ def create_user(user_name: str, account: common.Account,
         }
     
     payload = {
-        'jti': uuid.uuid4().hex,
+        'jti': uuid.uuid4().hex if jwt_id is None else jwt_id,
         'iat': int(issued_at.timestamp()),
         'iss': account.pub_key,
         'name': user_name,

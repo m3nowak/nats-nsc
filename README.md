@@ -1,7 +1,4 @@
 # nats-nsc
 
-Python wrapper for nsc, NATS credential manager.
+Limited python nsc utility equivalent, for user creation and signing JWTs.
 
-## Requirements
-
-This library requires you to have nsc already installed. [Instructions](https://github.com/nats-io/nsc#install)
