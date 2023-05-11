@@ -16,6 +16,7 @@ package-dir = "src"
 [project]
 name = "nats-nsc"
 version = "0.3.1"
+
 description = "Limited python nsc utility equivalent, for user creation and signing JWTs."
 authors = [
     {name = "Mikołaj Nowak", email = "12396461+m3nowak@users.noreply.github.com"},
