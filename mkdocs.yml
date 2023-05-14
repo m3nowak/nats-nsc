@@ -4,8 +4,8 @@ theme:
     highlightjs: true
 
 nav:
-  - Home: index.md
-  - My Module: nats_nsc_module.md
+  - Basics: index.md
+  - nats_nsc module reference: nats_nsc_module.md
 
 
 plugins:
@@ -16,6 +16,7 @@ plugins:
         python:
           preload_modules: __all__
           load_external_modules: true
-
+          show_if_no_docstring: true
           paths:
             - src
+          group_by_category: true
