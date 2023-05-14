@@ -1,3 +1,4 @@
+"""Home of the create_user function."""
 import typing as ty
 from datetime import timedelta, datetime
 import uuid
@@ -28,7 +29,33 @@ def create_user(user_name: str, account: common.Account,
                 source_networks: ty.Optional[ty.List[str]] = None,
                 start: ty.Union[timedelta, datetime, None] = None,
                 tag: ty.Optional[ty.List[str]] = None) -> common.User:
-    '''Create user.'''
+    """Create user.
+
+    Args:
+        user_name (str): Name of the user.
+        account (common.Account): Account to create the user for.
+        pub_key (str): Public key of the user.
+        jwt_id (ty.Optional[str], optional): JWT identifier. If not provided, a random UUID is generated.
+        allow_pub (ty.Optional[ty.List[str]], optional): List of allowed publication subjects. Defaults to None.
+        allow_pub_response (ty.Optional[int], optional): Number of responses allowed for each publication. Defaults to 1.
+        allow_pubsub (ty.Optional[ty.List[str]], optional): List of allowed publication and subscription subjects. Defaults to None.
+        allow_sub (ty.Optional[ty.List[str]], optional): List of allowed subscription subjects. Defaults to None.
+        bearer (bool, optional): Whether the user is a bearer token. Defaults to False.
+        deny_pub (ty.Optional[ty.List[str]], optional): List of denied publication subjects. Defaults to None.
+        deny_pubsub (ty.Optional[ty.List[str]], optional): List of denied publication and subscription subjects. Defaults to None.
+        deny_sub (ty.Optional[ty.List[str]], optional): List of denied subscription subjects. Defaults to None.
+        expiry (ty.Optional[timedelta], optional): Expiry of the user token. Defaults to None (does not expire).
+        response_ttl (ty.Optional[timedelta], optional): Response TTL. Defaults to None.
+        source_networks (ty.Optional[ty.List[str]], optional): Allowed source networks. Defaults to None (all allowed).
+        start (ty.Union[timedelta, datetime, None], optional): Datetime, or timedelta from now, when the token is valid from. Defaults to None (now).
+        tag (ty.Optional[ty.List[str]], optional): List of tags. Defaults to None.
+
+    Raises:
+        ValueError: Invalid parameters.
+
+    Returns:
+        common.User: User object.
+    """ # noqa: 501
     if not account.has_key:
         raise ValueError('Account has no key')
     

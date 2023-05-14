@@ -1,3 +1,5 @@
+"""Basic types and functions used by the nats-nsc package."""
+
 import asyncio
 import os
 import typing as ty

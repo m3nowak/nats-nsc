@@ -1,0 +1,21 @@
+site_name: nats-nsc documentation
+theme:
+    name: readthedocs
+    highlightjs: true
+
+nav:
+  - Home: index.md
+  - My Module: nats_nsc_module.md
+
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          preload_modules: __all__
+          load_external_modules: true
+
+          paths:
+            - src

@@ -6,6 +6,8 @@ dev = [
     "pytest~=7.3.1",
     "pytest-asyncio~=0.21.0",
     "autopep8~=2.0.2",
+    "mkdocs>=1.4.3",
+    "mkdocstrings[python]>=0.21.2",
 ]
 
 [tool.pdm.build]
