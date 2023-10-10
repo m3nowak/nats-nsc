@@ -3,7 +3,7 @@
 import os
 import typing as ty
 from datetime import datetime, timedelta
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import Enum
 
 import jwt
@@ -24,8 +24,16 @@ def _key_subpath(pub_key: str) -> str:
     return os.path.join('keys', pub_key[:1], pub_key[1:3], f'{pub_key}.nk')
 
 
-@dataclass
-class AccountLimits():
+@dataclass(init=False)
+class _BaseInitForgivingExtras():
+    def __init__(self, **kwargs):
+        names = set([f.name for f in fields(self)])
+        for k, v in kwargs.items():
+            if k in names:
+                setattr(self, k, v)
+
+@dataclass(init=False)
+class AccountLimits(_BaseInitForgivingExtras):
     '''Account limits.'''
     subs: int
     data: int
@@ -37,8 +45,8 @@ class AccountLimits():
     leaf: int
 
 
-@dataclass
-class Permissions():
+@dataclass(init=False)
+class Permissions(_BaseInitForgivingExtras):
     '''Default pub/sub permissions.'''
     allow: ty.List[str]
     deny: ty.List[str]
