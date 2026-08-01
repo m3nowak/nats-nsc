@@ -14,9 +14,8 @@ plugins:
       default_handler: python
       handlers:
         python:
-          preload_modules: __all__
-          load_external_modules: true
-          show_if_no_docstring: true
           paths:
             - src
-          group_by_category: true
+          options:
+            show_if_no_docstring: true
+            group_by_category: true

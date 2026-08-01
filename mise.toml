@@ -1,0 +1,46 @@
+[tools]
+python = ["3.11", "3.12", "3.13", "3.14"]
+uv = "latest"
+
+[tasks.sync]
+description = "Synchronize the development environment"
+run = "uv sync --locked"
+
+[tasks.lint]
+description = "Lint the project"
+run = "uv run --locked ruff check src tests"
+
+[tasks."format-check"]
+description = "Check project formatting"
+run = "uv run --locked ruff format --check src tests"
+
+[tasks.format]
+description = "Format the project and fix lint violations"
+run = [
+    "uv run --locked ruff check --fix src tests",
+    "uv run --locked ruff format src tests",
+]
+
+[tasks.typecheck]
+description = "Type-check the project"
+run = "uv run --locked pyright"
+
+[tasks.test]
+description = "Run the test suite"
+run = "uv run --locked pytest"
+
+[tasks.docs]
+description = "Build the documentation"
+run = "uv run --locked mkdocs build"
+
+[tasks.build]
+description = "Build distribution artifacts"
+run = "uv build --no-sources"
+
+[tasks.quality]
+description = "Run static quality checks"
+depends = ["lint", "format-check", "typecheck"]
+
+[tasks.check]
+description = "Run all project checks"
+depends = ["quality", "test"]

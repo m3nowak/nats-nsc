@@ -1,46 +1,42 @@
-name: Build Docs
+name: Deploy Documentation
 
 on:
   workflow_dispatch:
   release:
     types: [published]
 
-
 permissions:
   contents: read
-  packages: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  build:
+  quality:
+    uses: ./.github/workflows/quality.yml
+
+  deploy:
+    name: Build and deploy
+    needs: quality
     environment:
-      name: pypi
-      url: https://pypi.org/p/nats-nsc
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.11'
-    - uses: pdm-project/setup-pdm@v3
-      name: Setup PDM
-      with:
-        python-version: '3.11'
-        architecture: x64
-    - name: Install dependencies
-      run: pdm install --dev
-    - name: build docs
-      run: pdm run mkdocs build
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Upload Pages Artifact
-      uses: actions/upload-pages-artifact@v1
-      with:
-        path: site
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      - uses: actions/checkout@v7
+      - name: Install tools
+        uses: jdx/mise-action@v4
+      - name: Build documentation
+        run: mise run docs
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
